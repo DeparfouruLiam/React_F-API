@@ -6,16 +6,6 @@ const App = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [token, setToken] = useState('');
-
-    // Login form state
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-
-    // Champs pour la recherche par IBAN
-    const [ibanSearch, setIbanSearch] = useState('');
-    const [searchedAccount, setSearchedAccount] = useState(null);
-
-    // Login function
     async function loginUser() {
         try {
             const inputs = { username, password };
@@ -45,6 +35,47 @@ const App = () => {
             setError("Network error");
         }
     }
+    const searchByIban = async () => {
+        setError('');
+        setSearchedAccount(null);
+
+        if (!ibanSearch) {
+            setError("Veuillez entrer un IBAN");
+            return;
+        }
+
+        try {
+            const storedToken = localStorage.getItem("token") || token;
+            const response = await fetch(
+                `http://127.0.0.1:8000/user/get_account_by_iban?iban=${ibanSearch}`,
+                {
+                    method: 'GET',
+                    headers: {
+                        "Authorization": `Bearer ${storedToken}`,
+                        "Content-Type": "application/json"
+                    }
+                }
+            );
+            if (!response.ok) {
+                const err = await response.json();
+                throw new Error(err.detail || "Compte introuvable");
+            }
+            const data = await response.json();
+            setSearchedAccount(data.account);
+        } catch (err) {
+            setError(err.message);
+        }
+    };
+
+    // Login form state
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+
+    // Champs pour la recherche par IBAN
+    const [ibanSearch, setIbanSearch] = useState('');
+    const [searchedAccount, setSearchedAccount] = useState(null);
+
+    // Login function
 
     // Fetch accounts
     useEffect(() => {
@@ -83,37 +114,6 @@ const App = () => {
     }, [token]); // refetch if token changes
 
     // Recherche d'un compte par IBAN
-    const searchByIban = async () => {
-        setError('');
-        setSearchedAccount(null);
-
-        if (!ibanSearch) {
-            setError("Veuillez entrer un IBAN");
-            return;
-        }
-
-        try {
-            const storedToken = localStorage.getItem("token") || token;
-            const response = await fetch(
-                `http://127.0.0.1:8000/user/get_account_by_iban?iban=${ibanSearch}`,
-                {
-                    method: 'GET',
-                    headers: {
-                        "Authorization": `Bearer ${storedToken}`,
-                        "Content-Type": "application/json"
-                    }
-                }
-            );
-            if (!response.ok) {
-                const err = await response.json();
-                throw new Error(err.detail || "Compte introuvable");
-            }
-            const data = await response.json();
-            setSearchedAccount(data.account);
-        } catch (err) {
-            setError(err.message);
-        }
-    };
 
     return (
         <div style={{ padding: "20px" }}>
