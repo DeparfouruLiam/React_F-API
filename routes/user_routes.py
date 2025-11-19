@@ -103,12 +103,23 @@ def get_my_user(user=Depends(get_user), session = Depends(get_session)):
 
 @router.get("/get_all_accounts")
 def get_all_accounts(user=Depends(get_user), session = Depends(get_session)):
-    ibans = ""
     user_id = session.query(User).filter_by(username=user["username"]).first().id
     all_accounts = session.query(Account).filter_by(user_id=user_id).all()
-    for x in all_accounts:
-        ibans += x.iban+" : "+str(x.amount)+" zennys ; "
-    return {"All your accounts are": ibans}
+
+    # Créer une liste d'objets pour chaque compte
+    account_info = [{"iban": x.iban, "amount": x.amount} for x in all_accounts]
+
+    return {"accounts": account_info}
+
+@router.get("/get_account_of_user")
+def get_account_by_iban(iban: str, user=Depends(get_user), session = Depends(get_session)):
+    user_id = session.query(User).filter_by(username=user["username"]).first().id
+    account = session.query(Account).filter_by(user_id=user_id, iban=iban).first()
+    if account is None:
+        raise HTTPException(status_code=404, detail="Compte non trouvé pour cet IBAN.")
+    return {
+        "account": account,
+    }
 
 class CreateBeneficiary(BaseModel):
     username: str
