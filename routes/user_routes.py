@@ -50,21 +50,27 @@ def generate_token(user: CreateUser):
 @router.get("/test")
 def test():
     me()
+
+class Register(BaseModel):
+    username: str
+    password: str
+    iban: str
+
 @router.post("/register")
-def register_user(body: CreateUser,body_account:CreateAccount, session = Depends(get_session)) -> str:
+def register_user(body: Register, session = Depends(get_session)) -> dict:
     user = session.query(User).filter_by(username=body.username).first()
     if user:
-        raise HTTPException(status_code=404, detail="Username already used")
+        raise HTTPException(status_code=409, detail="Username already used")
     user = User(username=body.username, password=body.password)
     session.add(user)
     session.commit()
     session.refresh(user)
-    account = Account(amount=100, iban=body_account.iban, user_id=user.id, is_main=True)
+    account = Account(amount=100, iban=body.iban, user_id=user.id, is_main=True)
     session.add(account)
     session.commit()
     session.refresh(account)
     login(CreateUser(username=body.username, password=body.password),session)
-    return "Account created"
+    return {"message": "Account created"}
 
 @router.post("/login")
 def login(user: CreateUser, session = Depends(get_session)):

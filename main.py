@@ -44,7 +44,6 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 async def periodic_task():
     while True:
-        print("Function is running every 10 seconds")
         # Put your actual function code here
         await asyncio.sleep(10)
 
