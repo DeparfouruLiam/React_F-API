@@ -1,7 +1,7 @@
 import {useState} from "react";
 
-function PaymentModal({ visible, onCancel, onPay }) {
-    const [iban, setIban] = useState("");
+export default function PaymentModal({ visible, onCancel, onPay }) {
+    const [receiverIban, setIban] = useState("");
     const [amount, setAmount] = useState("");
 
     if (!visible) return null;
@@ -31,7 +31,7 @@ function PaymentModal({ visible, onCancel, onPay }) {
                 <input
                     type="text"
                     placeholder="Receiver IBAN"
-                    value={iban}
+                    value={receiverIban}
                     onChange={(e) => setIban(e.target.value)}
                     style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
                 />
@@ -45,7 +45,7 @@ function PaymentModal({ visible, onCancel, onPay }) {
                 />
 
                 <button
-                    onClick={() => { onPay(iban, parseFloat(amount)); setIban(""); setAmount(""); }}
+                    onClick={() => { onPay(receiverIban,  parseFloat(amount)); setIban(""); setAmount(""); }}
                     style={{ padding: "8px 12px", marginRight: "10px" }}
                 >
                     Confirm

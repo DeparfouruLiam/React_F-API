@@ -1,68 +1,8 @@
 import { useState } from "react";
 import AmountModal from "./AccountModal";
+import PaymentModal from "./PaymentModal";
 
 // PaymentModal with IBAN + Amount
-function PaymentModal({ visible, onCancel, onPay }) {
-    const [iban, setIban] = useState("");
-    const [amount, setAmount] = useState("");
-
-    if (!visible) return null;
-
-    return (
-        <div style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100vw",
-            height: "100vh",
-            background: "rgba(0,0,0,0.5)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 1100
-        }}>
-            <div style={{
-                background: "black",
-                padding: "20px",
-                borderRadius: "8px",
-                width: "300px",
-                textAlign: "center"
-            }}>
-                <h3>Make a Payment</h3>
-
-                <input
-                    type="text"
-                    placeholder="Receiver IBAN"
-                    value={iban}
-                    onChange={(e) => setIban(e.target.value)}
-                    style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
-                />
-
-                <input
-                    type="number"
-                    placeholder="Amount"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                    style={{ width: "100%", padding: "8px", marginBottom: "15px" }}
-                />
-
-                <button
-                    onClick={() => { onPay(iban, parseFloat(amount)); setIban(""); setAmount(""); }}
-                    style={{ padding: "8px 12px", marginRight: "10px" }}
-                >
-                    Confirm
-                </button>
-
-                <button
-                    onClick={onCancel}
-                    style={{ padding: "8px 12px", background: "tomato", color: "white" }}
-                >
-                    Cancel
-                </button>
-            </div>
-        </div>
-    );
-}
 
 export default function AccountCard({ account, token, refreshAccounts }) {
     const [open, setOpen] = useState(false);
@@ -88,7 +28,7 @@ export default function AccountCard({ account, token, refreshAccounts }) {
         }
     }
 
-    async function makePayment(receiverIban, amount) {
+    async function makePayment(sender_iban,receiver_iban, amount) {
         try {
             const res = await fetch("http://127.0.0.1:8000/transaction/transfer", {
                 method: "POST",
@@ -96,7 +36,7 @@ export default function AccountCard({ account, token, refreshAccounts }) {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${token}`,
                 },
-                body: JSON.stringify({ receiver_iban: receiverIban, amount }),
+                body: JSON.stringify({  sender_iban, receiver_iban, amount }),
             });
 
             const data = await res.json();
@@ -176,7 +116,10 @@ export default function AccountCard({ account, token, refreshAccounts }) {
             <PaymentModal
                 visible={showPaymentModal}
                 onCancel={() => setShowPaymentModal(false)}
-                onPay={makePayment}
+                onPay={async (receiverIban,amount) => {
+                    setShowPaymentModal(false);
+                    await makePayment(account.iban ,receiverIban,amount);
+                }}
             />
         </div>
     );
