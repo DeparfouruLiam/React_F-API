@@ -54,7 +54,7 @@ def create_account(body: CreateAccount, user=Depends(get_user), session = Depend
     user_id = session.query(User).filter_by(username=user["username"]).first().id
     if user_id == 0:
         raise HTTPException(status_code=404, detail="User not connected")
-    account = Account(amount=100, iban=body.iban, user_id=user_id)
+    account = Account(amount=0, iban=body.iban, user_id=user_id)
     session.add(account)
     session.commit()
     session.refresh(account)

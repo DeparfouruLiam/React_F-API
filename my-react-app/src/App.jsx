@@ -260,17 +260,17 @@ const App = () => {
                 <p>{message}</p>
             </div>
             <div>
+                <h1>Créer un nouveau compte :</h1>
                 <input
                     type="text"
                     placeholder="Iban"
                     value={ibanAdd}
                     onChange={(e) => setIbanAdd(e.target.value)}
                 />
-                <h1>Créer un nouveau compte :</h1>
                 <button onClick={async () => {
-                    await addAccount({ iban: ibanAdd }, token);
+                    await addAccount({iban: ibanAdd}, token);
                     await fetchAccounts();
-                }}>SelectAccount
+                }}>Ajouter
                 </button>
                 <h5>{currentAccount}</h5>
             </div>
