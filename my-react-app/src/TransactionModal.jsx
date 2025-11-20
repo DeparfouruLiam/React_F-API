@@ -3,6 +3,7 @@ export default function TransactionsModal({ visible, transactions, myIban, onClo
 
     return (
         <div style={{
+            zIndex:9999,
             position: "fixed",
             top: 0, left: 0,
             width: "100vw", height: "100vh",
