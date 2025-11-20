@@ -54,7 +54,7 @@ def create_account(body: CreateAccount, user=Depends(get_user), session = Depend
     user_id = session.query(User).filter_by(username=user["username"]).first().id
     if user_id == 0:
         raise HTTPException(status_code=404, detail="User not connected")
-    account = Account(amount=100, iban=body.iban, user_id=user_id)
+    account = Account(amount=0, iban=body.iban, user_id=user_id)
     session.add(account)
     session.commit()
     session.refresh(account)
@@ -66,7 +66,7 @@ def get_my_account():
 
 
 @router.delete("/delete_account")
-def delete_account(iban: str, user=Depends(get_user), session=Depends(get_session)):
+def delete_account(body: CreateAccount, user=Depends(get_user), session=Depends(get_session)):
     if user is None:
         raise HTTPException(status_code=401, detail="Not connected")
 
@@ -79,10 +79,10 @@ def delete_account(iban: str, user=Depends(get_user), session=Depends(get_sessio
         ibans.append(x.iban)
 
     # Vérifie que le compte appartient bien à l'utilisateur
-    if iban not in ibans:
+    if body.iban not in ibans:
         raise HTTPException(status_code=403, detail="You do not have an account linked to this IBAN")
 
-    to_delete = session.query(Account).filter_by(iban=iban).first()
+    to_delete = session.query(Account).filter_by(iban=body.iban).first()
 
     if to_delete.is_main:
         raise HTTPException(status_code=403, detail="You cannot delete your main account")
@@ -98,4 +98,4 @@ def delete_account(iban: str, user=Depends(get_user), session=Depends(get_sessio
 
     update_account_id(main_account.id)
 
-    return {"message": f"Account {iban} successfully deleted"}
+    return {"message": f"Account {body.iban} successfully deleted"}

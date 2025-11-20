@@ -71,6 +71,18 @@ export default function AccountCard({ account, token, refreshAccounts }) {
         }
     }
 
+    async function deleteAccount(iban,token) {
+        const inputs = {iban};
+
+        const res = await fetch("http://127.0.0.1:8000/accounts/delete_account", {
+            method: "DELETE",
+            headers: { "Authorization": `Bearer ${token}`,"Content-Type": "application/json" },
+            body: JSON.stringify(inputs)
+        });
+
+        console.log("Account deleted");
+    }
+
     return (
         <div style={{
             border: "1px solid #ccc",
@@ -120,13 +132,20 @@ export default function AccountCard({ account, token, refreshAccounts }) {
                         Payment
                     </button>
 
-                    <button style={{ padding: "8px", background: "tomato", color: "white" }}>
+                    <button
+                        onClick={async () => {
+                            await deleteAccount(account.iban, token);
+                            await refreshAccounts();}}
+                        style={{
+                            padding: "8px",
+                            background: "tomato",
+                            color: "white",
+                        }}
+                    >
                         Clôturer
                     </button>
                 </div>
             )}
-
-            {/* Existing modals */}
             <AmountModal
                 visible={showModal}
                 onCancel={() => setShowModal(false)}
@@ -135,7 +154,6 @@ export default function AccountCard({ account, token, refreshAccounts }) {
                     await sendMoney(amount, account.iban);
                 }}
             />
-
             <PaymentModal
                 visible={showPaymentModal}
                 onCancel={() => setShowPaymentModal(false)}

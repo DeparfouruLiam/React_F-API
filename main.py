@@ -44,8 +44,10 @@ app.include_router(beneficiary_routes.router)
 app = FastAPI(title="Gooning Factory API")
 
 origins = [
-    "http://localhost:3000",
     "http://localhost:5173",
+    "http://localhost:3000",
+    "http://127.0.0.1:5173",
+    "http://localhost:5174"
 ]
 
 app.add_middleware(
