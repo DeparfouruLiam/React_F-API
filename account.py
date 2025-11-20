@@ -8,6 +8,7 @@ class Account(SQLModel, table=True):
     iban: str = Field(index=True)
     user_id: int = Field(index=True)
     is_main: bool = Field(default=False, index=True)
+    activated: bool = Field(default=True, index=True)
 #All accounts
 # LiamAccount = Account (100, "Aled", [TransactionLG])
 # GhaziAccount = Account (10, "Yiouiuh", [TransactionLG])
@@ -47,17 +48,17 @@ def get_iban():
 
 
 def get_current_account():
-    return CurrentAccount
+    return CurrentAccountId
 
 # def add_account(iban: str):
 #     new_account = Account(0, iban, [])
 #     accounts.append(new_account)
 #     return new_account
 
-def update_current_account(new_account):
-    global CurrentAccount
-    CurrentAccount = new_account
-    return CurrentAccount
+def update_current_account(new_account_id):
+    global CurrentAccountId
+    CurrentAccountId = new_account_id
+    return CurrentAccountId
 
 # def account_from_iban(iban):
 #     return next((x for x in get_accounts() if x.get_iban() == iban), None)

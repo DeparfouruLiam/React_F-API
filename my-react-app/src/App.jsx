@@ -15,18 +15,21 @@ async function registerUser({username,password,iban}, setMessage) {
     setMessage(data.message);
 }
 
-async function loginUser({username,password}, setUser) {
-    const inputs = { username, password };
+async function selectAccount({iban},setCurrentAccount,token) {
+    const inputs = {iban};
 
-    const res = await fetch("http://127.0.0.1:8000/user/login", {
+    const res = await fetch("http://127.0.0.1:8000/accounts/choose_current_account", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Authorization": `Bearer ${token}`,"Content-Type": "application/json" },
         body: JSON.stringify(inputs)
     });
 
     const data = await res.json();
-    setUser(data.token);
-    console.log(data)
+    const newIban = data["Current account successfully updated to"]
+    if (newIban!=null){
+        setCurrentAccount(newIban);
+    }
+    console.log(newIban);
 }
 
 const App = () => {
@@ -35,6 +38,7 @@ const App = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [token, setToken] = useState('');
+    const [currentAccount, setcurrentAccount] = useState([]);
 
     // Register variables
     const [message, setMessage] = useState("");
@@ -258,6 +262,11 @@ const App = () => {
                 </button>
                 <p>{message}</p>
             </div>
+            <button onClick={() => selectAccount({
+                iban: ibanRegister
+                },setcurrentAccount,token)}>SelectAccount
+            </button>
+            <h5>{currentAccount}</h5>
         </div>
     );
 };
