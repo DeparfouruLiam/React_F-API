@@ -1,6 +1,8 @@
+
+import reactLogo from './assets/react.svg'
+import viteLogo from '/vite.svg'
 import './App.css'
 import { useEffect, useState } from "react";
-import AccountCard from "./AccountCard.jsx";
 
 async function registerUser({username,password,iban}, setMessage) {
     const inputs = { username, password, iban };
@@ -15,26 +17,29 @@ async function registerUser({username,password,iban}, setMessage) {
     setMessage(data.message);
 }
 
-async function loginUser({username,password}, setUser) {
-    const inputs = { username, password };
+async function selectAccount({iban},setCurrentAccount,token) {
+    const inputs = {iban};
 
-    const res = await fetch("http://127.0.0.1:8000/user/login", {
+    const res = await fetch("http://127.0.0.1:8000/accounts/choose_current_account", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Authorization": `Bearer ${token}`,"Content-Type": "application/json" },
         body: JSON.stringify(inputs)
     });
 
     const data = await res.json();
-    setUser(data.token);
-    console.log(data)
+    const newIban = data["Current account successfully updated to"]
+    if (newIban!=null){
+        setCurrentAccount(newIban);
+    }
+    console.log(newIban);
 }
 
 const App = () => {
-
     const [accounts, setAccounts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [token, setToken] = useState('');
+    const [currentAccount, setcurrentAccount] = useState([]);
 
     // Register variables
     const [message, setMessage] = useState("");
@@ -83,77 +88,45 @@ const App = () => {
             setError("Network error");
         }
     }
-    const fetchAccounts = async () => {
-        const storedToken = localStorage.getItem("token") || token;
-        if (!storedToken) {
-            console.error("No token found. User not logged in.");
-            setLoading(false);
-            return;
-        }
 
-        try {
-            const res = await fetch("http://127.0.0.1:8000/user/get_all_accounts", {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${storedToken}`,
-                },
-            });
-
-            if (res.status === 401) {
-                console.error("Unauthorized - invalid or expired token");
-                setError("Unauthorized - please login");
-                setAccounts([]);
+    // Fetch accounts
+    useEffect(() => {
+        const fetchAccounts = async () => {
+            const storedToken = localStorage.getItem("token") || token;
+            if (!storedToken) {
+                console.error("No token found. User not logged in.");
+                setLoading(false);
                 return;
             }
 
-            const data = await res.json();
-            setAccounts(data.accounts || []);
-        } catch (err) {
-            console.error(err);
-            setError("Failed to fetch accounts");
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        fetchAccounts();
-    }, [token]);
-    // Recherche d'un compte par IBAN
-    const searchByIban = async () => {
-        setError('');
-        setSearchedAccount(null);
-
-        if (!ibanSearch) {
-            setError("Veuillez entrer un IBAN");
-            return;
-        }
-
-        try {
-            const storedToken = localStorage.getItem("token") || token;
-            const response = await fetch(
-                `http://127.0.0.1:8000/user/get_account_by_iban?iban=${ibanSearch}`,
-                {
-                    method: 'GET',
+            try {
+                const res = await fetch("http://127.0.0.1:8000/user/get_all_accounts", {
+                    method: "GET",
                     headers: {
+                        "Content-Type": "application/json",
                         "Authorization": `Bearer ${storedToken}`,
-                        "Content-Type": "application/json"
-                    }
+                    },
+                });
+
+                if (res.status === 401) {
+                    console.error("Unauthorized - invalid or expired token");
+                    setError("Unauthorized - please login");
+                    setAccounts([]);
+                    return;
                 }
-            );
 
-            if (!response.ok) {
-                const err = await response.json();
-                throw new Error(err.detail || "Compte introuvable");
+                const data = await res.json();
+                setAccounts(data.accounts || []);
+            } catch (err) {
+                console.error(err);
+                setError("Failed to fetch accounts");
+            } finally {
+                setLoading(false);
             }
+        };
 
-            const data = await response.json();
-            setSearchedAccount(data.account);
-        } catch (err) {
-            setError(err.message);
-        }
-    };
+        fetchAccounts();
+    }, [token]); // refetch if token changes
 
     return (
         <div style={{padding: "20px"}}>
@@ -194,7 +167,7 @@ const App = () => {
                         onChange={(e) => setIbanSearch(e.target.value)}
                         style={{padding: "6px", marginRight: "10px"}}
                     />
-                    <button onClick={searchByIban}>Rechercher</button>
+
 
                     {/* Résultat de la recherche */}
                     {searchedAccount && (
@@ -215,15 +188,22 @@ const App = () => {
                         <h2>Liste des comptes</h2>
 
                         {accounts.length > 0 ? (
-                            <div>
+                            <table>
+                                <thead>
+                                <tr>
+                                    <th>IBAN</th>
+                                    <th>Montant</th>
+                                </tr>
+                                </thead>
+                                <tbody>
                                 {accounts.map((account, index) => (
-                                    <AccountCard
-                                        key={index}
-                                        account={account}
-                                        token={token}
-                                        refreshAccounts={fetchAccounts}
-                                    />                                ))}
-                            </div>
+                                    <tr key={index}>
+                                        <td>{account.iban}</td>
+                                        <td>{account.amount} Zennys</td>
+                                    </tr>
+                                ))}
+                                </tbody>
+                            </table>
                         ) : (
                             <p>Aucun compte trouvé</p>
                         )}
@@ -258,6 +238,11 @@ const App = () => {
                 </button>
                 <p>{message}</p>
             </div>
+            <button onClick={() => selectAccount({
+                iban: ibanRegister
+                },setcurrentAccount,token)}>SelectAccount
+            </button>
+            <h5>{currentAccount}</h5>
         </div>
     );
 };
