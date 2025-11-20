@@ -12,28 +12,29 @@ from jose import JWTError, jwt
 from database import create_db_and_tables
 from routes import account_routes, user_routes, transaction_routes, beneficiary_routes, database_routes
 
-from fastapi.middleware.cors import CORSMiddleware
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routes import account_routes, transaction_routes, user_routes, beneficiary_routes
+from routes import transaction_routes  # Assuming the routes are in a `routes` folder
 
 app = FastAPI()
 
-# CORS settings
+# Define allowed origins (your frontend address)
 origins = [
-    "http://localhost:5173",  # React dev server
-    "http://127.0.0.1:5173"
+    "http://localhost:5173",  # Your frontend URL
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=origins,  # Specify allowed origins
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["*"],  # Allow all methods (GET, POST, PUT, DELETE, etc.)
+    allow_headers=["*"],  # Allow all headers
 )
 
+# Include your routes here
+app.include_router(transaction_routes.router)
+
+# Include your routes here
 # Include your routes
 app.include_router(user_routes.router)
 app.include_router(account_routes.router)

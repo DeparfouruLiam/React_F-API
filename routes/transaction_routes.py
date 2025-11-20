@@ -12,12 +12,34 @@ from pydantic import BaseModel
 
 class AddMoneyRequest(BaseModel):
     amount: float
+    iban: str
 router = APIRouter(prefix="/transaction", tags=["Transaction"])
 
 class CreateTransaction(BaseModel):
     receiver_iban: str
     amount: int
 
+@router.post("/add_money")
+def add_money(body: AddMoneyRequest, session = Depends(get_session)):
+     if body.amount <= 0:
+         raise HTTPException(status_code=400, detail="Amount must be positive")
+
+     iban = body.iban
+     if not iban:
+         raise HTTPException(status_code=400, detail="Not connected to an account")
+
+     account = session.query(Account).filter_by(iban=iban).first()
+     if not account:
+         raise HTTPException(status_code=404, detail="Account not found")
+
+     account.amount += body.amount
+     session.commit()
+
+     return {
+         "message": "Money added successfully",
+         "iban": account.iban,
+         "new_amount": account.amount
+     }
 @router.post("/transfer")
 def transfer_amount(body: CreateTransaction, session = Depends(get_session)):
     if get_iban() is "":
@@ -45,18 +67,6 @@ def add_self(body: CreateTransaction, session = Depends(get_session)):
     create_thread(current_transaction, session)
     return {"The transfer was successful.   new amount": get_amount()  }
 
-@router.post("/add_money")
-def add_money(body: AddMoneyRequest,  session = Depends(get_session)):
-    iban = get_iban()
-    if not iban:
-        raise HTTPException(status_code=400, detail="Not connected to an account")
-    account = session.query(Account).filter_by(iban=iban).first()
-    if not account:
-        raise HTTPException(status_code=404, detail="Account not found")
-    if body.amount <= 0:
-        raise HTTPException(status_code=400, detail="Amount must be positive")
-    account.amount += body.amount
-    session.commit()
     return {
         "message": "Money added successfully",
         "iban": account.iban,

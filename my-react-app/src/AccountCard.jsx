@@ -69,7 +69,7 @@ export default function AccountCard({ account, token, refreshAccounts }) {
     const [showModal, setShowModal] = useState(false);
     const [showPaymentModal, setShowPaymentModal] = useState(false);
 
-    async function sendMoney(amount) {
+    async function sendMoney(amount,iban) {
         try {
             const res = await fetch("http://127.0.0.1:8000/transaction/add_money", {
                 method: "POST",
@@ -77,7 +77,7 @@ export default function AccountCard({ account, token, refreshAccounts }) {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${token}`,
                 },
-                body: JSON.stringify({ amount }),
+                body: JSON.stringify({ amount ,iban}),
             });
             const data = await res.json();
             alert(JSON.stringify(data));
@@ -165,18 +165,14 @@ export default function AccountCard({ account, token, refreshAccounts }) {
                     </button>
                 </div>
             )}
-
-            {/* Amount Modal */}
             <AmountModal
                 visible={showModal}
                 onCancel={() => setShowModal(false)}
                 onConfirm={async (amount) => {
                     setShowModal(false);
-                    await sendMoney(amount);
+                    await sendMoney(amount,account.iban);
                 }}
             />
-
-            {/* Payment Modal */}
             <PaymentModal
                 visible={showPaymentModal}
                 onCancel={() => setShowPaymentModal(false)}
