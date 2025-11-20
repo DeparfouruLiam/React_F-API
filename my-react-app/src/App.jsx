@@ -51,11 +51,9 @@ const App = () => {
     const [password, setPassword] = useState('');
 
     // Champs pour la recherche par IBAN
-    const [ibanSearch, setIbanSearch] = useState('');
-    const [searchedAccount, setSearchedAccount] = useState(null);
 
     // Login function
-    async function loginUser() {
+      async function loginUser() {
         try {
             const inputs = { username, password };
 
@@ -124,40 +122,6 @@ const App = () => {
     useEffect(() => {
         fetchAccounts();
     }, [token]);
-    // Recherche d'un compte par IBAN
-    const searchByIban = async () => {
-        setError('');
-        setSearchedAccount(null);
-
-        if (!ibanSearch) {
-            setError("Veuillez entrer un IBAN");
-            return;
-        }
-
-        try {
-            const storedToken = localStorage.getItem("token") || token;
-            const response = await fetch(
-                `http://127.0.0.1:8000/user/get_account_by_iban?iban=${ibanSearch}`,
-                {
-                    method: 'GET',
-                    headers: {
-                        "Authorization": `Bearer ${storedToken}`,
-                        "Content-Type": "application/json"
-                    }
-                }
-            );
-
-            if (!response.ok) {
-                const err = await response.json();
-                throw new Error(err.detail || "Compte introuvable");
-            }
-
-            const data = await response.json();
-            setSearchedAccount(data.account);
-        } catch (err) {
-            setError(err.message);
-        }
-    };
 
     return (
         <div style={{padding: "20px"}}>
@@ -186,29 +150,6 @@ const App = () => {
                 </div>
             )}
 
-            {/* Recherche par IBAN */}
-            {token && (
-                <div style={{marginBottom: "20px"}}>
-                    <h2>Rechercher un compte par IBAN</h2>
-
-                    <input
-                        type="text"
-                        placeholder="Entrez un IBAN"
-                        value={ibanSearch}
-                        onChange={(e) => setIbanSearch(e.target.value)}
-                        style={{padding: "6px", marginRight: "10px"}}
-                    />
-                    <button onClick={searchByIban}>Rechercher</button>
-
-                    {/* Résultat de la recherche */}
-                    {searchedAccount && (
-                        <div style={{marginTop: "10px", padding: "10px", background: "#eef"}}>
-                            <p><strong>IBAN :</strong> {searchedAccount.iban}</p>
-                            <p><strong>Solde :</strong> {searchedAccount.amount}</p>
-                        </div>
-                    )}
-                </div>
-            )}
 
             {/* Liste de tous les comptes */}
             {token && (

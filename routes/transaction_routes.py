@@ -9,11 +9,20 @@ from database import get_session
 from user import *
 import config
 from pydantic import BaseModel
+router = APIRouter(prefix="/transaction", tags=["Transaction"])
+
+@router.get("/transactions/{iban}")
+def get_transactions_for_account(iban: str, session = Depends(get_session)):
+    transactions = session.query(Transaction).filter(
+        (Transaction.ibanSender == iban) |
+        (Transaction.ibanReceiver == iban)
+    ).order_by(Transaction.date.desc()).all()
+
+    return {"transactions": transactions}
 
 class AddMoneyRequest(BaseModel):
     amount: float
     iban: str
-router = APIRouter(prefix="/transaction", tags=["Transaction"])
 
 class CreateTransaction(BaseModel):
     sender_iban: str
