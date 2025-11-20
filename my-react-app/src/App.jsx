@@ -1,8 +1,6 @@
-
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 import { useEffect, useState } from "react";
+import AccountCard from "./AccountCard.jsx";
 
 async function registerUser({username,password,iban}, setMessage) {
     const inputs = { username, password, iban };
@@ -32,6 +30,7 @@ async function loginUser({username,password}, setUser) {
 }
 
 const App = () => {
+
     const [accounts, setAccounts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -84,46 +83,43 @@ const App = () => {
             setError("Network error");
         }
     }
+    const fetchAccounts = async () => {
+        const storedToken = localStorage.getItem("token") || token;
+        if (!storedToken) {
+            console.error("No token found. User not logged in.");
+            setLoading(false);
+            return;
+        }
 
-    // Fetch accounts
-    useEffect(() => {
-        const fetchAccounts = async () => {
-            const storedToken = localStorage.getItem("token") || token;
-            if (!storedToken) {
-                console.error("No token found. User not logged in.");
-                setLoading(false);
+        try {
+            const res = await fetch("http://127.0.0.1:8000/user/get_all_accounts", {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${storedToken}`,
+                },
+            });
+
+            if (res.status === 401) {
+                console.error("Unauthorized - invalid or expired token");
+                setError("Unauthorized - please login");
+                setAccounts([]);
                 return;
             }
 
-            try {
-                const res = await fetch("http://127.0.0.1:8000/user/get_all_accounts", {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${storedToken}`,
-                    },
-                });
+            const data = await res.json();
+            setAccounts(data.accounts || []);
+        } catch (err) {
+            console.error(err);
+            setError("Failed to fetch accounts");
+        } finally {
+            setLoading(false);
+        }
+    };
 
-                if (res.status === 401) {
-                    console.error("Unauthorized - invalid or expired token");
-                    setError("Unauthorized - please login");
-                    setAccounts([]);
-                    return;
-                }
-
-                const data = await res.json();
-                setAccounts(data.accounts || []);
-            } catch (err) {
-                console.error(err);
-                setError("Failed to fetch accounts");
-            } finally {
-                setLoading(false);
-            }
-        };
-
+    useEffect(() => {
         fetchAccounts();
-    }, [token]); // refetch if token changes
-
+    }, [token]);
     // Recherche d'un compte par IBAN
     const searchByIban = async () => {
         setError('');
@@ -219,22 +215,15 @@ const App = () => {
                         <h2>Liste des comptes</h2>
 
                         {accounts.length > 0 ? (
-                            <table>
-                                <thead>
-                                <tr>
-                                    <th>IBAN</th>
-                                    <th>Montant</th>
-                                </tr>
-                                </thead>
-                                <tbody>
+                            <div>
                                 {accounts.map((account, index) => (
-                                    <tr key={index}>
-                                        <td>{account.iban}</td>
-                                        <td>{account.amount} Zennys</td>
-                                    </tr>
-                                ))}
-                                </tbody>
-                            </table>
+                                    <AccountCard
+                                        key={index}
+                                        account={account}
+                                        token={token}
+                                        refreshAccounts={fetchAccounts}
+                                    />                                ))}
+                            </div>
                         ) : (
                             <p>Aucun compte trouvé</p>
                         )}

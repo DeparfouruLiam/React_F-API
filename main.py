@@ -13,6 +13,33 @@ from database import create_db_and_tables
 from routes import account_routes, user_routes, transaction_routes, beneficiary_routes, database_routes
 
 from fastapi.middleware.cors import CORSMiddleware
+
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from routes import account_routes, transaction_routes, user_routes, beneficiary_routes
+
+app = FastAPI()
+
+# CORS settings
+origins = [
+    "http://localhost:5173",  # React dev server
+    "http://127.0.0.1:5173"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Include your routes
+app.include_router(user_routes.router)
+app.include_router(account_routes.router)
+app.include_router(transaction_routes.router)
+app.include_router(beneficiary_routes.router)
+
 app = FastAPI(title="Gooning Factory API")
 
 origins = [

@@ -8,7 +8,10 @@ from account import *
 from database import get_session
 from user import *
 import config
+from pydantic import BaseModel
 
+class AddMoneyRequest(BaseModel):
+    amount: float
 router = APIRouter(prefix="/transaction", tags=["Transaction"])
 
 class CreateTransaction(BaseModel):
@@ -22,7 +25,7 @@ def transfer_amount(body: CreateTransaction, session = Depends(get_session)):
     receiver = session.query(Account).filter_by(iban=body.receiver_iban).first()
     if receiver is None:
         return {"No account linked to the IBAN of the receiver"}
-    if get_iban() is receiver.iban:
+    if get_iban() == receiver.iban:
         return {"Transfer must be from one account to another"}
     if body.amount > get_amount():
         return {"Sender doesn't have enough to transfer the amount"}
@@ -33,6 +36,33 @@ def transfer_amount(body: CreateTransaction, session = Depends(get_session)):
 
     return {"The transfer was successful. "+get_iban()+" new amount": get_amount(), receiver.iban+" new amount": receiver.amount}
 
+@router.post("/add_self")
+def add_self(body: CreateTransaction, session = Depends(get_session)):
+    if get_iban() is "":
+        return {"Not connected to an account"}
+    current_transaction = {"sender_iban":get_iban(),"receiver_iban": get_iban(),"amount": body.amount}
+    config.transactionCount+=1
+    create_thread(current_transaction, session)
+    return {"The transfer was successful.   new amount": get_amount()  }
+
+@router.post("/add_money")
+def add_money(body: AddMoneyRequest,  session = Depends(get_session)):
+    iban = get_iban()
+    if not iban:
+        raise HTTPException(status_code=400, detail="Not connected to an account")
+    account = session.query(Account).filter_by(iban=iban).first()
+    if not account:
+        raise HTTPException(status_code=404, detail="Account not found")
+    if body.amount <= 0:
+        raise HTTPException(status_code=400, detail="Amount must be positive")
+    account.amount += body.amount
+    session.commit()
+    return {
+        "message": "Money added successfully",
+        "iban": account.iban,
+        "new_amount": account.amount
+    }
+
 def create_thread(trs: dict, session = Depends(get_session)):
     transaction = Transaction(ibanSender=trs.get("sender_iban"),ibanReceiver=trs.get("receiver_iban"), amount=trs.get("amount"))
     session.add(transaction)
@@ -41,7 +71,6 @@ def create_thread(trs: dict, session = Depends(get_session)):
     thread = Thread(target=check_flag_later, args=(transaction.id, session))
     thread.start()
     return {"message": "Object created and background check started."}
-
 
 def check_flag_later(id_transaction:int , session = Depends(get_session)):
     time.sleep(5)
