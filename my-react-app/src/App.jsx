@@ -15,21 +15,17 @@ async function registerUser({username,password,iban}, setMessage) {
     setMessage(data.message);
 }
 
-async function selectAccount({iban},setCurrentAccount,token) {
+async function addAccount({iban},token) {
     const inputs = {iban};
 
-    const res = await fetch("http://127.0.0.1:8000/accounts/choose_current_account", {
+    const res = await fetch("http://127.0.0.1:8000/accounts/create_account", {
         method: "POST",
         headers: { "Authorization": `Bearer ${token}`,"Content-Type": "application/json" },
         body: JSON.stringify(inputs)
     });
 
-    const data = await res.json();
-    const newIban = data["Current account successfully updated to"]
-    if (newIban!=null){
-        setCurrentAccount(newIban);
-    }
-    console.log(newIban);
+    console.log("Account created");
+
 }
 
 const App = () => {
@@ -45,6 +41,7 @@ const App = () => {
     const [usernameRegister, setUsernameRegister] = useState("");
     const [passwordRegister, setPasswordRegister] = useState("");
     const [ibanRegister, setIbanRegister] = useState("");
+    const [ibanAdd, setIbanAdd] = useState("");
 
     // Login form state
     const [username, setUsername] = useState('');
@@ -226,7 +223,7 @@ const App = () => {
                                         account={account}
                                         token={token}
                                         refreshAccounts={fetchAccounts}
-                                    />                                ))}
+                                    />))}
                             </div>
                         ) : (
                             <p>Aucun compte trouvé</p>
@@ -235,7 +232,7 @@ const App = () => {
                 )
             )}
             <div>
-                <h1>Créer un compte :</h1>
+                <h1>Inscription :</h1>
                 <input
                     type="text"
                     placeholder="Username"
@@ -262,11 +259,21 @@ const App = () => {
                 </button>
                 <p>{message}</p>
             </div>
-            <button onClick={() => selectAccount({
-                iban: ibanRegister
-                },setcurrentAccount,token)}>SelectAccount
-            </button>
-            <h5>{currentAccount}</h5>
+            <div>
+                <input
+                    type="text"
+                    placeholder="Iban"
+                    value={ibanAdd}
+                    onChange={(e) => setIbanAdd(e.target.value)}
+                />
+                <h1>Créer un nouveau compte :</h1>
+                <button onClick={async () => {
+                    await addAccount({ iban: ibanAdd }, token);
+                    await fetchAccounts();
+                }}>SelectAccount
+                </button>
+                <h5>{currentAccount}</h5>
+            </div>
         </div>
     );
 };

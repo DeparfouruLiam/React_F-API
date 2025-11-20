@@ -49,6 +49,18 @@ export default function AccountCard({ account, token, refreshAccounts }) {
         }
     }
 
+    async function deleteAccount(iban,token) {
+        const inputs = {iban};
+
+        const res = await fetch("http://127.0.0.1:8000/accounts/delete_account", {
+            method: "DELETE",
+            headers: { "Authorization": `Bearer ${token}`,"Content-Type": "application/json" },
+            body: JSON.stringify(inputs)
+        });
+
+        console.log("Account deleted");
+    }
+
     return (
         <div
             style={{
@@ -95,6 +107,9 @@ export default function AccountCard({ account, token, refreshAccounts }) {
                     </button>
 
                     <button
+                        onClick={async () => {
+                            await deleteAccount(account.iban, token);
+                            await refreshAccounts();}}
                         style={{
                             padding: "8px",
                             background: "tomato",
