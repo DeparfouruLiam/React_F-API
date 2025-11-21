@@ -172,49 +172,55 @@ const App = () => {
                     </div>
                 )
             )}
-            <div>
-                <h1>Inscription :</h1>
-                <input
-                    type="text"
-                    placeholder="Username"
-                    value={usernameRegister}
-                    onChange={(e) => setUsernameRegister(e.target.value)}
-                />
-                <input
-                    type="text"
-                    placeholder="Password"
-                    value={passwordRegister}
-                    onChange={(e) => setPasswordRegister(e.target.value)}
-                />
-                <input
-                    type="text"
-                    placeholder="Iban"
-                    value={ibanRegister}
-                    onChange={(e) => setIbanRegister(e.target.value)}
-                />
-                <button onClick={() => registerUser({
-                    username: usernameRegister,
-                    password: passwordRegister,
-                    iban: ibanRegister
-                }, setMessage)}>Register
-                </button>
-                <p>{message}</p>
-            </div>
-            <div>
-                <h1>Créer un nouveau compte :</h1>
-                <input
-                    type="text"
-                    placeholder="Iban"
-                    value={ibanAdd}
-                    onChange={(e) => setIbanAdd(e.target.value)}
-                />
-                <button onClick={async () => {
-                    await addAccount({iban: ibanAdd}, token);
-                    await fetchAccounts();
-                }}>Ajouter
-                </button>
-                <h5>{currentAccount}</h5>
-            </div>
+            {token === undefined || false ||   token === "" ? (
+                <div>
+                    <h1>Inscription :</h1>
+                    <input
+                        type="text"
+                        placeholder="Username"
+                        value={usernameRegister}
+                        onChange={(e) => setUsernameRegister(e.target.value)}
+                    />
+
+                    <input
+                        type="text"
+                        placeholder="Password"
+                        value={passwordRegister}
+                        onChange={(e) => setPasswordRegister(e.target.value)}
+                    />
+                    <input
+                        type="text"
+                        placeholder="Iban"
+                        value={ibanRegister}
+                        onChange={(e) => setIbanRegister(e.target.value)}
+                    />
+
+                    <button onClick={() => registerUser({
+                        username: usernameRegister,
+                        password: passwordRegister,
+                        iban: ibanRegister
+                    }, setMessage)}>Register
+                    </button>
+                    <p>{message}</p>
+                </div>
+            ) : (
+                <div>
+                    <h1>Créer un nouveau compte :</h1>
+                    <input
+                        type="text"
+                        placeholder="Iban"
+                        value={ibanAdd}
+                        onChange={(e) => setIbanAdd(e.target.value)}
+                    />
+                    <button onClick={async () => {
+                        await addAccount({iban: ibanAdd}, token);
+                        await fetchAccounts();
+                    }}>Ajouter
+                    </button>
+                    <h5>{currentAccount}</h5>
+                </div>            )}
+
+
         </div>
     );
 };
