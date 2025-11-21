@@ -34,8 +34,7 @@ const App = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [token, setToken] = useState('');
-    const [currentAccount, setcurrentAccount] = useState([]);
-
+    const [currentAccount] = useState([]);
     // Register variables
     const [message, setMessage] = useState("");
     const [usernameRegister, setUsernameRegister] = useState("");
