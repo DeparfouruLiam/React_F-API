@@ -1,16 +1,16 @@
 import { useState } from "react";
 import AmountModal from "./AccountModal";
 import PaymentModal from "./PaymentModal";
-import TransactionsModal from "./TransactionModal";   // <== ADD THIS
+import TransactionsModal from "./TransactionModal";
+import AccountInfoModal from "./AccountInfoModal.jsx";   // <== ADD THIS
 
 export default function AccountCard({ account, token, refreshAccounts }) {
     const [open, setOpen] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [showPaymentModal, setShowPaymentModal] = useState(false);
-
-    // NEW STATE:
     const [showTransactions, setShowTransactions] = useState(false);
     const [transactions, setTransactions] = useState([]);
+    const [showInfoModal, setShowInfoModal] = useState(false);  // New state for account info modal
 
     async function getTransactions() {
         try {
@@ -112,12 +112,19 @@ export default function AccountCard({ account, token, refreshAccounts }) {
             <p>Solde : {account.amount} Zennys</p>
 
             {open && (
+
                 <div style={{ marginTop: "12px" }}>
                     <button onClick={() => setShowModal(true)} style={{ padding: "8px", marginRight: "10px" }}>
                         Ajouter
                     </button>
 
-                    {/* NEW BUTTON */}
+                    <button
+                        onClick={() => setShowInfoModal(true)}
+                        style={{ padding: "8px", background: "#555", color: "white", marginRight: "10px" }}
+                    >
+                        Info
+                    </button>
+
                     <button
                         style={{ padding: "8px", background: "#444", color: "white", marginRight: "10px" }}
                         onClick={getTransactions}
@@ -168,6 +175,12 @@ export default function AccountCard({ account, token, refreshAccounts }) {
                 transactions={transactions}
                 type={account.iban}
                 onClose={() => setShowTransactions(false)}
+            />
+
+            <AccountInfoModal
+                visible={showInfoModal}
+                onClose={() => setShowInfoModal(false)}
+                account={account}
             />
         </div>
     );

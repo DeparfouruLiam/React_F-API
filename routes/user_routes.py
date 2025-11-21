@@ -106,8 +106,17 @@ def get_all_accounts(user=Depends(get_user), session = Depends(get_session)):
     user_id = session.query(User).filter_by(username=user["username"]).first().id
     all_accounts = session.query(Account).filter_by(user_id=user_id).all()
 
-    # Créer une liste d'objets pour chaque compte
-    account_info = [{"iban": x.iban, "amount": x.amount} for x in all_accounts]
+    account_info = [
+        {
+            "id": x.id,
+            "iban": x.iban,
+            "amount": x.amount,
+            "user_id": x.user_id,
+            "is_main": x.is_main,
+            "activated": x.activated
+        }
+        for x in all_accounts
+    ]
 
     return {"accounts": account_info}
 
