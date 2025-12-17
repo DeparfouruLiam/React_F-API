@@ -7,8 +7,10 @@
     "outputDirectory": "."
   },
   "devDependencies": {
-    "jest-junit": "github:jest-community/jest-junit"
-  },
+  "jest": "^29.7.0",
+  "jest-junit": "github:jest-community/jest-junit",
+  "jest-environment-jsdom": "^29.7.0"
+}
   "name": "react-f-api",
   "version": "1.0.0",
   "private": true,
