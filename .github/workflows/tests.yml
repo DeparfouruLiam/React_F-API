@@ -35,29 +35,30 @@ jobs:
           path: junit.xml
 
       - name: Envoi d'un email en cas d'échec
-        if: failure() && secrets.MAIL_TO != ''
+        if: failure()
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: ${{ secrets.SMTP_SERVER }}
           server_port: ${{ secrets.SMTP_PORT }}
           username: ${{ secrets.SMTP_USERNAME }}
           password: ${{ secrets.SMTP_PASSWORD }}
-
+      
           subject: ❌ Échec des tests - ${{ github.repository }}
-
+      
           body: |
             Bonjour,
-
+      
             Les tests ont échoué suite au push sur le dépôt :
             - Repository : ${{ github.repository }}
             - Branche : ${{ github.ref_name }}
             - Auteur : ${{ github.actor }}
-
+      
             Merci de consulter le pipeline GitHub Actions :
             ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-
+      
             Cordialement,
             GitHub Actions
-
+      
           to: ${{ secrets.MAIL_TO }}
           from: GitHub Actions <${{ secrets.SMTP_USERNAME }}>
+
