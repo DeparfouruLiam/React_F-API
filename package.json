@@ -5,5 +5,8 @@
   "jest-junit": {
     "outputName": "junit.xml",
     "outputDirectory": "."
+  },
+  "devDependencies": {
+    "jest-junit": "github:jest-community/jest-junit"
   }
 }
