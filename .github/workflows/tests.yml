@@ -1,4 +1,4 @@
-name: CI - Tests automatiques
+name: CI - Tests automatiques2
 
 on:
   push:
