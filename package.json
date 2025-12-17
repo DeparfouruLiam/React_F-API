@@ -8,5 +8,30 @@
   },
   "devDependencies": {
     "jest-junit": "github:jest-community/jest-junit"
+  },
+  "name": "react-f-api",
+  "version": "1.0.0",
+  "private": true,
+
+  "scripts": {
+    "test": "jest"
+  },
+
+  "dependencies": {
+    "react-router-dom": "^7.9.6"
+  },
+
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "jest-junit": "github:jest-community/jest-junit"
+  },
+
+  "jest": {
+    "testEnvironment": "jsdom"
+  },
+
+  "jest-junit": {
+    "outputName": "junit.xml",
+    "outputDirectory": "."
   }
 }
