@@ -1,33 +1,59 @@
-name: Tests Pipeline
+name: CI - Tests automatiques
 
 on:
   push:
-    branches: [ main, develop ]
-  pull_request:
+    branches:
+      - main
+      - develop
 
 jobs:
-  tests:
-    name: Run unit tests
+  test:
+    name: Exécution des tests
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout source code
+      - name: Checkout du dépôt
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Installation de Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
 
-      - name: Install dependencies
+      - name: Installation des dépendances
         run: npm install
 
-      - name: Run tests with coverage
-        run: npm test -- --coverage
+      - name: Exécution des tests
+        run: npm test
 
-      - name: Upload test report
-        if: always()  
+      - name: Upload du rapport de tests
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-report
-          path: coverage/
+          name: rapport-tests
+          path: junit.xml
+
+      - name: Envoi d'un email en cas d'échec
+        if: failure()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.SMTP_SERVER }}
+          server_port: ${{ secrets.SMTP_PORT }}
+          username: ${{ secrets.SMTP_USERNAME }}
+          password: ${{ secrets.SMTP_PASSWORD }}
+          subject: ❌ Échec des tests - ${{ github.repository }}
+          body: |
+            Bonjour,
+
+            Les tests ont échoué suite au push sur le dépôt :
+            - Repository : ${{ github.repository }}
+            - Branche : ${{ github.ref_name }}
+            - Auteur : ${{ github.actor }}
+
+            Merci de consulter le pipeline GitHub Actions :
+            ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+            Cordialement,
+            GitHub Actions
+          to: ${{ secrets.MAIL_TO }}
+          from: GitHub Actions <${{ secrets.SMTP_USERNAME }}>
