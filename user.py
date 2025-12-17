@@ -72,11 +72,9 @@ def hash_password(password):
     return f"{ 100_000}${binascii.hexlify(salt).decode()}${binascii.hexlify(dk).decode()}"
 
 def getCurrentUserId():
-    global CurrentUserId
     return CurrentUserId
 
 def getCurrentUserName():
-    global CurrentUserName
     return CurrentUserName
 
 CurrentUser = 0

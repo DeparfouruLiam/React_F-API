@@ -35,15 +35,12 @@ def update_iban(new_iban):
     CurrentIban = new_iban
 
 def get_account_id():
-    global CurrentAccountId
     return CurrentAccountId
 
 def get_amount():
-    global CurrentAmount
     return CurrentAmount
 
 def get_iban():
-    global CurrentIban
     return CurrentIban
 
 
