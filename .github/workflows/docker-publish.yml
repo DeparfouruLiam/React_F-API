@@ -21,13 +21,12 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
+
       # 3️⃣ Build et push backend
       - name: Build and Push Backend
         run: |
-          TAG=${GITHUB_SHA::8}  # 8 premiers caractères du commit SHA
-          docker build -t ntmfpd/backend:latest -t ntmfpd/backend:$TAG .
-          docker push ntmfpd/backend:latest
-          docker push ntmfpd/backend:$TAG
+          docker build -t monuser/backend:latest .
+          docker push monuser/backend:latest
 
       # 4️⃣ Build et push frontend
       - name: Build and Push Frontend
