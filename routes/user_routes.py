@@ -58,6 +58,13 @@ class Register(BaseModel):
 
 @router.post("/register")
 def register_user(body: Register, session = Depends(get_session)) -> dict:
+    """
+    Crée un utilisateur depuis son username password et crée un compte à son nom avec son iban
+
+    :param body: Register contenant un username, password et iban
+    :param session: Base de données
+    :return: Message de validation
+    """
     user = session.query(User).filter_by(username=body.username).first()
     if user:
         raise HTTPException(status_code=409, detail="Username already used")

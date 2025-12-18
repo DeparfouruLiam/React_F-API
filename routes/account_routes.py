@@ -51,6 +51,12 @@ def choose_current_account(body: CreateAccount, user=Depends(get_user), session=
 
 @router.post("/create_account", response_model=CreateAccount)
 def create_account(body: CreateAccount, user=Depends(get_user), session = Depends(get_session)) -> Account:
+    """
+    :param body: CreateAccount contenant un IBAN
+    :param user: User actuel
+    :param session:
+    :return:
+    """
     user_id = session.query(User).filter_by(username=user["username"]).first().id
     if user_id == 0:
         raise HTTPException(status_code=404, detail="User not connected")
