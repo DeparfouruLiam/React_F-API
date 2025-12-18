@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   backend:
     build: .
@@ -23,11 +21,11 @@ services:
     image: deparfouruliam/react-f-api:latest
 
     # Nom du conteneur (optionnel mais pratique)
-    container_name: backend
+    container_name: backend_image
 
     # Port exposé (host:container)
     ports:
-      - "8000:8000"
+      - "8001:8000"
 
     # Réseau privé Docker utilisé par le service
     networks:
@@ -37,10 +35,10 @@ services:
     # Image Docker du frontend publiée sur Docker Hub
     image: deparfouruliam/frontend:latest
 
-    container_name: frontend
+    container_name: frontend_image
 
     ports:
-      - "8080:80"
+      - "8081:80"
 
     # Le frontend dépend du backend
     depends_on:
