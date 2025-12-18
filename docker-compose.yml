@@ -3,7 +3,23 @@ version: "3.9"
 services:
   backend:
     build: .
-      # Image Docker du backend publiée sur Docker Hub
+    container_name: backend
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build:
+      context: ./my-react-app
+      args:
+        VITE_API_URL: http://backend:8000
+    container_name: frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+
+  backend-image:
+    # Image Docker du backend publiée sur Docker Hub
     image: deparfouruliam/react-f-api:latest
 
     # Nom du conteneur (optionnel mais pratique)
@@ -17,11 +33,7 @@ services:
     networks:
       - app_network
 
-  frontend:
-    build:
-      context: ./my-react-app
-      args:
-        VITE_API_URL: http://backend:8000
+  frontend-image:
     # Image Docker du frontend publiée sur Docker Hub
     image: deparfouruliam/frontend:latest
 
@@ -36,6 +48,7 @@ services:
 
     networks:
       - app_network
+
 
 # Définition des réseaux Docker
 networks:
