@@ -1,48 +1,13 @@
-from typing import TypedDict
-from fastapi import FastAPI, Depends
-from routes import account_routes,user_routes,transaction_routes,beneficiary_routes
 import asyncio
-from fastapi import FastAPI, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from datetime import datetime, timedelta
-from jose import JWTError, jwt
-
-
-
-from database import create_db_and_tables
-from routes import account_routes, user_routes, transaction_routes, beneficiary_routes, database_routes
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routes import transaction_routes  # Assuming the routes are in a `routes` folder
 
-app = FastAPI()
-
-# Define allowed origins (your frontend address)
-origins = [
-    "http://localhost:5173",  # Your frontend URL
-]
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,  # Specify allowed origins
-    allow_credentials=True,
-    allow_methods=["*"],  # Allow all methods (GET, POST, PUT, DELETE, etc.)
-    allow_headers=["*"],  # Allow all headers
-)
-
-# Include your routes here
-app.include_router(transaction_routes.router)
-
-# Include your routes here
-# Include your routes
-app.include_router(user_routes.router)
-app.include_router(account_routes.router)
-app.include_router(transaction_routes.router)
-app.include_router(beneficiary_routes.router)
+from routes import account_routes, user_routes, transaction_routes, beneficiary_routes, database_routes
+from database import create_db_and_tables
 
 app = FastAPI(title="Gooning Factory API")
 
+# Allowed origins
 origins = [
     "http://localhost:5173",
     "http://localhost:3000",
@@ -58,33 +23,28 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.on_event("startup")
-def on_startup():
-    create_db_and_tables()
-
-@app.get("/goofy")
-def goofy():
-    return {"message": "AAAAAAAAAAAA"}
-
-
-
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-
-
-async def periodic_task():
-    while True:
-        # Put your actual function code here
-        await asyncio.sleep(10)
-
-@app.on_event("startup")
-async def startup_event():
-    asyncio.create_task(periodic_task())
-
-
+# Include routers
 app.include_router(account_routes.router)
 app.include_router(user_routes.router)
 app.include_router(transaction_routes.router)
 app.include_router(beneficiary_routes.router)
-
 app.include_router(database_routes.router)
+
+# Database initialization
+@app.on_event("startup")
+def on_startup():
+    create_db_and_tables()
+
+# Example endpoint
+@app.get("/goofy")
+def goofy():
+    return {"message": "AAAAAAAAAAAA"}
+
+# Periodic task example
+async def periodic_task():
+    while True:
+        await asyncio.sleep(10)  # Remplace par ton code réel
+
+@app.on_event("startup")
+async def startup_event():
+    asyncio.create_task(periodic_task())

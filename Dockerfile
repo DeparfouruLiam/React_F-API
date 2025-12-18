@@ -1,4 +1,4 @@
-# Image Python officielle légère
+# Utiliser une image Python légère
 FROM python:3.11-slim
 
 # Empêche Python de créer des fichiers .pyc
@@ -7,22 +7,18 @@ ENV PYTHONDONTWRITEBYTECODE=1
 # Force l'affichage immédiat des logs
 ENV PYTHONUNBUFFERED=1
 
-# Dossier de travail dans le container
+# Définir le répertoire de travail
 WORKDIR /app
 
-# Copie des dépendances Python
-# Permet d'optimiser le cache Docker
+# Copier les dépendances et installer
 COPY requirements.txt .
-
-# Installation des dépendances
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copie du code backend
-COPY *.py ./
-COPY database.db ./
+# Copier tout le code source
+COPY . .
 
-# Exposition du port de l'API
+# Exposer le port FastAPI
 EXPOSE 8000
 
-# Commande de démarrage (FastAPI avec Uvicorn)
+# Commande de démarrage
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
