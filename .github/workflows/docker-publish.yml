@@ -25,12 +25,12 @@ jobs:
       - name: Build and Push Backend
         run: |
           TAG=${GITHUB_SHA::8}  # 8 premiers caractères du commit SHA
-          docker build -t monuser/backend:latest -t monuser/backend:$TAG .
-          docker push monuser/backend:latest
-          docker push monuser/backend:$TAG
+          docker build -t ntmfpd/backend:latest -t ntmfpd/backend:$TAG .
+          docker push ntmfpd/backend:latest
+          docker push ntmfpd/backend:$TAG
 
       # 4️⃣ Build et push frontend
       - name: Build and Push Frontend
         run: |
-          docker build -t monuser/frontend:latest ./my-react-app
-          docker push monuser/frontend:latest
+          docker build -t ntmfpd/frontend:latest ./my-react-app
+          docker push ntmfpd/frontend:latest
