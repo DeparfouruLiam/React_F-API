@@ -22,7 +22,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
 
-      # 3️⃣ Build et push backend
+      # 3️⃣ Build et push backendd
       - name: Build and Push Backend
         run: |
           docker build -t monuser/backend:latest .
