@@ -1,0 +1,41 @@
+version: "3.9"
+
+# Définition des services (conteneurs)
+services:
+
+  backend:
+    # Image Docker du backend publiée sur Docker Hub
+    image: deparfouruliam/react-f-api:latest
+
+    # Nom du conteneur (optionnel mais pratique)
+    container_name: backend-api
+
+    # Port exposé (host:container)
+    ports:
+      - "8000:8000"
+
+    # Réseau privé Docker utilisé par le service
+    networks:
+      - app_network
+
+  frontend:
+    # Image Docker du frontend publiée sur Docker Hub
+    image: deparfouruliam/frontend:latest
+
+    container_name: frontend-app
+
+    ports:
+      - "3000:3000"
+
+    # Le frontend dépend du backend
+    depends_on:
+      - backend
+
+    networks:
+      - app_network
+
+# Définition des réseaux Docker
+networks:
+  app_network:
+    # Réseau privé interne à Docker
+    driver: bridge
