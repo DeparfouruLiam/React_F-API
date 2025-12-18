@@ -1,24 +1,36 @@
-# Utiliser une image Python légère
+# =====================
+# IMAGE DE BASE
+# =====================
 FROM python:3.11-slim
 
-# Empêche Python de créer des fichiers .pyc
+# =====================
+# VARIABLES D'ENVIRONNEMENT
+# =====================
 ENV PYTHONDONTWRITEBYTECODE=1
-
-# Force l'affichage immédiat des logs
 ENV PYTHONUNBUFFERED=1
 
-# Définir le répertoire de travail
+# =====================
+# DOSSIER DE TRAVAIL
+# =====================
 WORKDIR /app
 
-# Copier les dépendances et installer
+# =====================
+# INSTALLATION DES DÉPENDANCES
+# =====================
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copier tout le code source
+# =====================
+# COPIE DU CODE SOURCE
+# =====================
 COPY . .
 
-# Exposer le port FastAPI
+# =====================
+# PORT À EXPOSER
+# =====================
 EXPOSE 8000
 
-# Commande de démarrage
+# =====================
+# COMMANDE DE LANCEMENT
+# =====================
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

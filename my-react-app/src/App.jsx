@@ -5,7 +5,7 @@ import AccountCard from "./AccountCard.jsx";
 async function registerUser({username,password,iban}, setMessage) {
     const inputs = { username, password, iban };
 
-    const res = await fetch("http://127.0.0.1:8000/user/register", {
+    const res = await fetch("http://backend:8000/user/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(inputs)
@@ -18,7 +18,7 @@ async function registerUser({username,password,iban}, setMessage) {
 async function addAccount({iban},token) {
     const inputs = {iban};
 
-    const res = await fetch("http://127.0.0.1:8000/accounts/create_account", {
+    const res = await fetch("http://backend:8000/accounts/create_account", {
         method: "POST",
         headers: { "Authorization": `Bearer ${token}`,"Content-Type": "application/json" },
         body: JSON.stringify(inputs)

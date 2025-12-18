@@ -9,10 +9,10 @@ app = FastAPI(title="Gooning Factory API")
 
 # Allowed origins
 origins = [
-    "http://localhost:5173",
-    "http://localhost:3000",
+    "http://backend:5173",
+    "http://backend:3000",
     "http://127.0.0.1:5173",
-    "http://localhost:5174"
+    "http://backend:5174"
 ]
 
 app.add_middleware(

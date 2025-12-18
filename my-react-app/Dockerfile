@@ -1,36 +1,37 @@
 # =====================
-# Étape 1 : build React
+# ÉTAPE 1 : BUILD REACT
 # =====================
 FROM node:20-alpine AS build
 
-# Dossier de travail
 WORKDIR /app
 
-# Copie des fichiers de dépendances
+# Copier et installer les dépendances
 COPY package*.json ./
-
-# Installation des dépendances
 RUN npm install
 
-# Copie du code source
+# Copier le code source
 COPY . .
 
-# Build de l'application Vite
+# Définir la variable d'environnement pour le backend
+ARG VITE_API_URL
+ENV VITE_API_URL=$VITE_API_URL
+
+# Build pour production
 RUN npm run build
 
 # =====================
-# Étape 2 : serveur nginx
+# ÉTAPE 2 : SERVEUR NGINX
 # =====================
 FROM nginx:alpine
 
-# Suppression de la configuration par défaut
-RUN rm /etc/nginx/conf.d/default.conf
-
-# Copie des fichiers buildés vers nginx
+# Copier le build React
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# Exposition du port HTTP
+# Copier la configuration nginx
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Exposer le port HTTP
 EXPOSE 80
 
-# Démarrage de nginx
+# Démarrer nginx
 CMD ["nginx", "-g", "daemon off;"]
