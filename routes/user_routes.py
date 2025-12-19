@@ -1,12 +1,11 @@
 from fastapi import HTTPException, Depends
 from pydantic import BaseModel
-from account import *
-from beneficiary import Beneficiary
+from account import Account,update_account_id,update_iban,update_amount
 from database import get_session
 from fastapi import APIRouter
 
-from user import *
-from auth import *
+from beneficiary import Beneficiary
+from user import User,update_current_name,update_current_id
 from fastapi.security import OAuth2PasswordBearer, HTTPBearer
 
 bearer_scheme = HTTPBearer()
@@ -37,6 +36,7 @@ def get_user(
         raise HTTPException(status_code=401, detail="Token expired")
     except jwt.InvalidTokenError:
         raise HTTPException(status_code=401, detail="Invalid token")
+
 def generate_token(user: CreateUser):
     return jwt.encode(user.dict(), secret_key, algorithm=algorithm)
 

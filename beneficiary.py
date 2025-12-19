@@ -1,13 +1,5 @@
 from sqlmodel import Field, SQLModel
-from typing import TypedDict
-from sqlmodel import Field, SQLModel
-from typing import TypedDict
-from datetime import *
-
-
-# class Beneficiary:
-#     username: str
-#     iban: str
+from datetime import datetime,timezone
 
 class Beneficiary(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
