@@ -1,20 +1,13 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import HTTPException, Depends
 from pydantic import BaseModel
 from account import *
 from beneficiary import Beneficiary
 from database import get_session
-from user import *
-from newclass import *
-from fastapi import APIRouter, HTTPException,Depends,status,Form
-from pydantic import BaseModel
+from fastapi import APIRouter
 
 from user import *
 from auth import *
-from fastapi.security import OAuth2PasswordBearer
-from typing import List, Optional
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from fastapi import Depends, HTTPException, status
-
+from fastapi.security import OAuth2PasswordBearer, HTTPBearer
 
 bearer_scheme = HTTPBearer()
 router = APIRouter(prefix="/user", tags=["User"])
@@ -158,18 +151,6 @@ def add_Beneficiary(body: CreateBeneficiary, user=Depends(get_user), session = D
         #get_current_user().add_beneficiaries(beneficiary)
         return  beneficiary
     return None
-
-
-# @router.post("/create_account", response_model=CreateAccount)
-# def create_account(body: CreateAccount, user=Depends(get_user), session = Depends(get_session)) -> Account:
-#     user_id = session.query(User).filter_by(username=user["username"]).first().id
-#     if user_id == 0:
-#         raise HTTPException(status_code=404, detail="User not connected")
-#     account = Account(amount=100, iban=body.iban, user_id=user_id)
-#     session.add(account)
-#     session.commit()
-#     session.refresh(account)
-#     return account
 
 
 @router.get("/showBeneficiary")

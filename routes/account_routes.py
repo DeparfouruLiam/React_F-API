@@ -1,10 +1,10 @@
 from fastapi import APIRouter, HTTPException, Depends
 from account import *
 from database import get_session
-from routes.user_routes import get_user, me
-from user import CurrentUser, get_current_user, getCurrentUserId, User
+from routes.user_routes import get_user
+from user import User
 from pydantic import BaseModel
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.security import HTTPBearer
 from fastapi.security import OAuth2PasswordBearer
 
 bearer_scheme = HTTPBearer()
@@ -14,7 +14,7 @@ router = APIRouter(prefix="/accounts", tags=["Accounts"])
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="Login")
 
 import jwt
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from fastapi.security import HTTPBearer
 
 secret_key = "very_secret_key"
 algorithm = "HS256"

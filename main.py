@@ -2,7 +2,7 @@ import asyncio
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from routes import account_routes, user_routes, transaction_routes, beneficiary_routes, database_routes
+from routes import account_routes, user_routes, transaction_routes
 from database import create_db_and_tables
 
 app = FastAPI(title="Gooning Factory API")
@@ -27,8 +27,6 @@ app.add_middleware(
 app.include_router(account_routes.router)
 app.include_router(user_routes.router)
 app.include_router(transaction_routes.router)
-app.include_router(beneficiary_routes.router)
-app.include_router(database_routes.router)
 
 # Database initialization
 @app.on_event("startup")
